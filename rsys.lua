@@ -41,6 +41,7 @@ _CFG = {
   retNormal = 0,
   retQuit = 1,
   retMinus = 2,
+  VERSION = 'RL52B'
 }
 
 -- a master table of Rogue Identities
@@ -108,20 +109,22 @@ Rogue = {
   deepest = 0,
   food = 0,
   hunger = 1,
+  favFruit = "slime-mold"
 }
 
 -- weapons!
 Weapons = {
-  ['mace'] = {},
-  ['long sword'] = {},
-  ['short bow'] = {},
-  ['arrow'] = {},
-  ['dagger'] = {},
-  ['two handed sword'] = {},
-  ['dart'] = {},
-  ['crossbow'] = {},
-  ['crossbow bolt'] = {},
-  ['spear'] = {},
+  -- dmg wield, dmg thrown, launcher, flags
+  ['mace'] =              { '2d4', '1d3', false, {} },
+  ['long sword'] =        { '3d4', '1d2', false, {} },
+  ['short bow'] =         { '1d1', '1d1', false, {} },
+  ['arrow'] =             { '1d1', '2d3', 'short bow', { [_ID.isMissle] = true , [_ID.isMany] = true } },
+  ['dagger'] =            { '1d6', '1d4', false, { [_ID.isMissle] = true } },
+  ['two handed sword'] =  { '4d4', '1d2', false, {} },
+  ['dart'] =              { '1d1', '1d3', false, { [_ID.isMissle] = true , [_ID.isMany] = true } },
+  ['crossbow'] =          { '1d1', '1d1', false, {} },
+  ['crossbow bolt'] =     { '1d2', '2d5', 'crossbow', { [_ID.isMissle] = true , [_ID.isMany] = true } },
+  ['spear'] =             { '2d3', '1d6', false, { [_ID.isMissle] = true } },
   [0] = 'mace',
   [1] = 'long sword',
   [2] = 'short bow',
