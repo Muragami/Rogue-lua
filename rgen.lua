@@ -49,6 +49,49 @@ function genShuffle(rng,list)
   rng = ret
 end
 
+function randPos(rng,room)
+  return room.x + rng.roll(room.mx - 2) + 1, room.y + rng.roll(room.my - 2) + 1
+end
+
+function drawRoom(rng,cfg,lvl,rnum,room)
+
+end
+
+function genMonster(rng,cfg,lvl,room,mx,my)
+  -- get the type
+  local d
+  repeat
+	   d = cfg.Level + rng.roll(10) - 5
+	   if d < 1 then d = rng.roll(5)
+     elseif d > 26 then d = rng.roll(5) + 21
+     end
+  until cfg.levelTable[d] ~= ' '
+  local mchar = cfg.levelTable[d]
+  local mons = { mchar, 'monster', Monster[mchar], x = wx, y = wy, insideRoom = room,
+        pos = wy*cfg.maxCols+wx, qty = numGP, flags = { [_ID.isMany] = true, [_ID.isItem] = true } }
+  -- is there something where the monster is? if so, hold it
+  local obj = lvl.map_data[mx+my*cfg.maxCols]
+  if obj and obj.flags[_ID.isItem] then mons.holding = obj end
+  -- find our stats
+  local mstat = Monster[Monster[mchar]][3] -- gotta love that indirection!
+  local hits = rng.rollDice(cfg.Level,8)
+  mons.stats = {
+    level = mstat[3],
+    maxHP = hits,
+    HP = hits,
+    armor = mstat[4],
+    dmg = mstat[5],
+    exp = mstat[2],
+    str = mstat[1],
+    carry = Monster[Monster[mchar]][1],
+    flags = Monster[Monster[mchar]][2],
+  }
+  if mchar == 'M' then mons.idTile = 23 + rng.roll(4)
+  else mons.idTile = Monster[Monster[mchar]][4] end
+  -- done, fire handlers
+  CallHandlers('gen monster',rng,cfg,lvl,mons)
+end
+
 function genRoom(rng,cfg,lvl,i)
   local TopX = math.fmod(i,lvl.block) * lvl.blockWidth
   local TopY = math.floor(i / lvl.block) * lvl.blockHeight
@@ -73,7 +116,30 @@ function genRoom(rng,cfg,lvl,i)
         room.x = TopX + rng.roll(lvl.blockWidth - room.mx)
         room.y = TopY + rng.roll(lvl.blockHeight - room.my)
     until room.y ~= 0
-
+    -- gold?
+    if rng.roll(2) == 1 and cfg.Level < max_level then
+      local numGP = rng.roll(36 + 10 * cfg.Level) + 4 -- how much?
+      -- where?
+      local wx,wy = randPos(rng,room)
+      -- create the item data and add it to the world
+      local item = { '*', 'gold', '', x = wx, y = wy, insideRoom = room,
+            pos = wy*cfg.maxCols+wx, qty = numGP, flags = { [_ID.isMany] = true, [_ID.isItem] = true } }
+      lvl.map_data[item.pos] = item
+      -- this room's GOT GOLD BABY!
+      room.flags[_ID.hasGold] = true
+      CallHandlers('gen gold',rng,cfg,lvl,rnum,item)
+    end
+    -- draw the room onto the map, put stub data
+    drawRoom(rng,cfg,lvl,rnum,room)
+    -- add a monster?
+    local monsterChance = 25
+    if room.flags[_ID.hasGold] then monsterChance = 80 end
+    if rng.roll(100) <= monsterChance then
+      local mx, my = randPos(rng,room)
+      genMonster(rng,cfg,lvl,room,mx,my)
+    end
+    -- all done, call gen room handlers
+    CallHandlers('gen room',rng,cfg,lvl,rnum,room)
   end
 end
 

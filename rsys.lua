@@ -49,6 +49,11 @@ _CFG = {
     -- this makes a virtual map 3 times larger than the minimum screen in both dimensions
     -- meaning, we see 1/9th of the total map at any time
   Level = 1,        -- default to level one if we pass this to gen()
+  -- monstertables!
+  levelTable = { 'K', 'J', 'B', 'S', 'H', 'E', 'A', 'O', 'Z', 'G', 'L', 'C', 'R',
+    'Q', 'N', 'Y', 'T', 'W', 'F', 'I', 'X', 'U', 'M', 'V', 'P', 'D' },
+  wanderingTable = { 'K', 'J', 'B', 'S', 'H', ' ', 'A', 'O', 'Z', 'G', ' ', 'C', 'R',
+    'Q', ' ', 'Y', 'T', 'W', ' ', 'I', 'X', 'U', ' ', 'V', 'P', ' ' },
 }
 
 -- a master table of Rogue Identities
@@ -67,7 +72,9 @@ _ID = {
                       -- hunger states
   isDark = {},
   isGone = {},
+  hasGold = {},
   isCursed = {},
+  isItem = {},
   isMany = {},
   isMissle = {},
   canSee = {},
@@ -308,7 +315,6 @@ Level = {
   room = {}
 }
 
-
 -- actions (everything here is a tick on the clock)
 Action = {
   -- std key, action name
@@ -361,33 +367,33 @@ Command = {
 
 -- monsters
 Monster = {
-          -- carry, flags, stats (str, exp,level, armor, hpt, dmg )
-  ['ant (giant)'] = { 0, { [_ID.isMean] = true }, { 10, 9, 2, 3, 1, '1d6' } },
-  ['bat'] = { 0, { [_ID.isFlying] = true }, { 10, 1, 1, 3, 1, '1d2' } },
-  ['centaur'] = { 0, {}, { 10, 15, 4, 4, 1, '1d6/1d6' } },
-  ['dragon'] = { 100, { [_ID.isMean] = true }, { 10, 6800, 10, -1, 1, '1d8/1d8/3d10' } },
-  ['floating eye'] = { 0, {}, { 10, 5, 1, 9, 1, '0d0' } },
-  ['violet fungi'] = { 0, { [_ID.isMean] = true }, { 10, 80, 8, 3, 1, '%%%d0' } },
-  ['gnome'] = { 10, {}, { 10, 7, 1, 5, 1, '1d6' } },
-  ['hobgoblin'] = { 0, { [_ID.isMean] = true }, { 10, 3, 1, 5, 1, '1d8' } },
-  ['invisible stalker'] = { 0, { [_ID.isInvisible] = true }, { 10, 120, 8, 3, 1, '4d4' } },
-  ['jackal'] = { 0, { [_ID.isMean] = true }, { 10, 2, 1, 7, 1, '1d2' } },
-  ['kobold'] = { 0, { [_ID.isMean] = true }, { 10, 1, 1, 7, 1, '1d4' } },
-  ['leprechaun'] = { 0, {}, { 10, 10, 3, 8, 1, '1d1' } },
-  ['mimic'] = { 30, {}, { 10, 100, 7, 7, 1, '3d4' } },
-  ['nymph'] = { 100, {}, { 10, 37, 3, 9, 1, '0d0' } },
-  ['orc'] = { 0, { [_ID.isGreedy] = true }, { 10, 5, 1, 6, 1, '1d8' } },
-  ['purple worm'] = { 70, {}, { 10, 4000, 15, 6, 1, '2d12/2d4' } },
-  ['quasit'] = { 30, { [_ID.isMean] = true, [_ID.isFlying] = true }, { 10, 32, 3, 2, 1, '1d2/1d2/1d4' } },
-  ['rust monster'] = { 0, { [_ID.isMean] = true }, { 10, 20, 5, 2, 1, '0d0/0d0' } },
-  ['snake'] = { 0, { [_ID.isMean] = true }, { 10, 2, 1, 5, 1, '1d3' } },
-  ['troll'] = { 50, { [_ID.isMean] = true, [_ID.isImmortal] = true }, { 10, 120, 6, 4, 1, '1d8/1d8/2d6' } },
-  ['umber hulk'] = { 40, { [_ID.isMean] = true }, { 10, 200, 8, 2, 1, '3d4/3d4/2d5' } },
-  ['vampire'] = { 20, { [_ID.isMean] = true, [_ID.isImmortal] = true }, { 10, 350, 8, 1, 1, '1d10' } },
-  ['wraith'] = { 0, {}, { 10, 55, 5, 4, 1, '1d6' } },
-  ['xorn'] = { 0, { [_ID.isMean] = true }, { 10, 190, 7, -2, 1, '1d3/1d3/1d3/4d6' } },
-  ['yeti'] = { 30, {}, { 10, 50, 4, 6, 1, '1d6/1d6' } },
-  ['zombie'] = { 0, { [_ID.isMean] = true }, { 10, 6, 2, 8, 1, '1d8' } },
+          -- carry, flags, stats (str, exp, level, armor, dmg ), tile
+  ['ant (giant)'] = { 0, { [_ID.isMean] = true }, { 10, 9, 2, 3, '1d6' }, 70 },
+  ['bat'] = { 0, { [_ID.isFlying] = true }, { 10, 1, 1, 3, '1d2' }, 71 },
+  ['centaur'] = { 0, {}, { 10, 15, 4, 4, '1d6/1d6' }, 72 },
+  ['dragon'] = { 100, { [_ID.isMean] = true }, { 10, 6800, 10, -1, '1d8/1d8/3d10' }, 73 },
+  ['floating eye'] = { 0, {}, { 10, 5, 1, 9, '0d0' }, 74 },
+  ['violet fungi'] = { 0, { [_ID.isMean] = true }, { 10, 80, 8, 3, '%%%d0' }, 75 },
+  ['gnome'] = { 10, {}, { 10, 7, 1, 5, '1d6' }, 76 },
+  ['hobgoblin'] = { 0, { [_ID.isMean] = true }, { 10, 3, 1, 5, '1d8' }, 77 },
+  ['invisible stalker'] = { 0, { [_ID.isInvisible] = true }, { 10, 120, 8, 3, '4d4' }, 78 },
+  ['jackal'] = { 0, { [_ID.isMean] = true }, { 10, 2, 1, 7, '1d2' }, 79 },
+  ['kobold'] = { 0, { [_ID.isMean] = true }, { 10, 1, 1, 7, '1d4' }, 80 },
+  ['leprechaun'] = { 0, {}, { 10, 10, 3, 8, '1d1' }, 81 },
+  ['mimic'] = { 30, {}, { 10, 100, 7, 7, '3d4' }, 82 },
+  ['nymph'] = { 100, {}, { 10, 37, 3, 9, '0d0' }, 83 },
+  ['orc'] = { 0, { [_ID.isGreedy] = true }, { 10, 5, 1, 6, '1d8' }, 84 },
+  ['purple worm'] = { 70, {}, { 10, 4000, 15, 6, '2d12/2d4' }, 85 },
+  ['quasit'] = { 30, { [_ID.isMean] = true, [_ID.isFlying] = true }, { 10, 32, 3, 2, '1d2/1d2/1d4' }, 86 },
+  ['rust monster'] = { 0, { [_ID.isMean] = true }, { 10, 20, 5, 2, '0d0/0d0' }, 87 },
+  ['snake'] = { 0, { [_ID.isMean] = true }, { 10, 2, 1, 5, '1d3' }, 88 },
+  ['troll'] = { 50, { [_ID.isMean] = true, [_ID.isImmortal] = true }, { 10, 120, 6, 4, '1d8/1d8/2d6' }, 89 },
+  ['umber hulk'] = { 40, { [_ID.isMean] = true }, { 10, 200, 8, 2, '3d4/3d4/2d5' }, 90 },
+  ['vampire'] = { 20, { [_ID.isMean] = true, [_ID.isImmortal] = true }, { 10, 350, 8, 1, '1d10' }, 91 },
+  ['wraith'] = { 0, {}, { 10, 55, 5, 4, '1d6' }, 92 },
+  ['xorn'] = { 0, { [_ID.isMean] = true }, { 10, 190, 7, -2, '1d3/1d3/1d3/4d6' }, 93 },
+  ['yeti'] = { 30, {}, { 10, 50, 4, 6, '1d6/1d6' }, 94 },
+  ['zombie'] = { 0, { [_ID.isMean] = true }, { 10, 6, 2, 8, '1d8' }, 95 },
   [0] = 'ant (giant)',
   [1] = 'bat',
   [2] = 'centaur',
@@ -413,5 +419,51 @@ Monster = {
   [22] = 'wraith',
   [23] = 'xorn',
   [24] = 'yeti',
-  [25] = 'zombie'
+  [25] = 'zombie',
+  ['A'] = 'ant (giant)',
+  ['B'] = 'bat',
+  ['C'] = 'centaur',
+  ['D'] = 'dragon',
+  ['E'] = 'floating eye',
+  ['F'] = 'violet fungi',
+  ['G'] = 'gnome',
+  ['H'] = 'hobgoblin',
+  ['I'] = 'invisible stalker',
+  ['J'] = 'jackal',
+  ['K'] = 'kobold',
+  ['L'] = 'leprechaun',
+  ['M'] = 'mimic',
+  ['N'] = 'nymph',
+  ['O'] = 'orc',
+  ['P'] = 'purple worm',
+  ['Q'] = 'quasit',
+  ['R'] = 'rust monster',
+  ['S'] = 'snake',
+  ['T'] = 'troll',
+  ['U'] = 'umber hulk',
+  ['V'] = 'vampire',
+  ['W'] = 'wraith',
+  ['X'] = 'xorn',
+  ['Y'] = 'yeti',
+  ['Z'] = 'zombie',
 }
+
+-- all event handlers (each a table of functions to be called when X happens)
+EventHandler = {
+  ['game start'] = {},
+  ['game over'] = {},
+  ['game save'] = {},
+  ['game load'] = {},
+  ['gen gold'] = {},
+  ['gen room'] = {},
+  ['gen level'] = {},
+  ['gen monster'] = {},
+}
+
+function CallHandlers(name,...)
+  for _,v in pairs(EventHandler[name]) do
+    if type(v) == 'table' then v:handle(name,...)
+    else v(name,...)
+    end
+  end
+end
