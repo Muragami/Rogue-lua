@@ -25,3 +25,56 @@ SOFTWARE.
 ]]
 
 require 'rsys'
+
+console = require 'lib.console.console'
+
+once = true
+_APP = 'Rogue-lua'
+_APP_VERSION = "alpha 0.1"
+
+function echo(txt)
+	for line in string.gmatch(txt,"([^\r\n]*)[\r\n]?") do
+   print(line)
+	end
+end
+
+function echoln(t)
+	for i,v in ipairs(t) do
+		print(tostring(i)..'] '..v)
+	end
+end
+
+function love.load(args)
+	echo("Welcome to " .. _APP .. " " .. _APP_VERSION)
+
+end
+
+function love.update(dt)
+	if once then console.show() once = false end
+end
+
+function love.draw()
+end
+
+function love.textinput(text)
+end
+
+function love.threaderror(thread, errorstr)
+	err("Thread error " .. tostring(thread) .. ": ")
+	for line in string.gmatch(errorstr,"([^\r\n]*)[\r\n]?") do
+   print("\t" .. line)
+	end
+end
+
+function love.keypressed(key, scancode, isrepeat)
+	if (key == console.toggle_key) then
+		console.toggle()
+	else
+	end
+end
+
+function love.resize(w, h)
+end
+
+function love.keyreleased(key, scancode)
+end
