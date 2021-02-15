@@ -41,11 +41,16 @@ _CFG = {
   retNormal = 0,
   retQuit = 1,
   retMinus = 2,
-  VERSION = 'RL52B'
+  VERSION = 'RL52B',
+  maxCols = 80,
+  maxLines = 45
+    -- this makes a virtual map 3 times larger than the minimum screen in both dimensions
+    -- meaning, we see 1/9th of the total map at any time
 }
 
 -- a master table of Rogue Identities
 _ID = {
+  nothing = {},      -- something that doesn't exist!
   hasAmulet = {},     -- recovered the amulet
   isScoreless = {},   -- can't score anything, cheating/broken!
   isPlaying = {},     -- we are playing
@@ -298,6 +303,7 @@ Level = {
   numTraps = 0,
   rooms = {}
 }
+
 
 -- actions (everything here is a tick on the clock)
 Action = {
