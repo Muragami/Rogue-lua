@@ -142,6 +142,11 @@ if _APP and _APP.useLÖVE then
       if type(xval) == 'string' then xval = hash_crc32(xval) end
       ret.gen = love.math.newRandomGenerator(x)
       ret.roll = function(self,num)  return math.floor(self.gen:random(num)) end
+      ret.rollDice = function(self,num,sides)
+        local ret = 0
+        for i=1,num,1 do ret = ret + math.floor(self.gen:random(sides)) end
+        return ret
+      end
       return ret
     end
   }
