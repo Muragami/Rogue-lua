@@ -27,9 +27,84 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]]
 
+-- create a list of numbers
+function genList(cnt)
+  local ret
+  for i=1,cnt,1 do
+    table.insert(ret,i)
+  end
+  return ret
+end
+
+-- shuffle a list (array table), shuffle in place
+function genShuffle(rng,list)
+  local len = #list
+  local ret = {}
+  for i=1,len,1 do
+    local spot = rng.roll(len)
+    ret[i] = list[spot]
+    table.remove(list,spot)
+    len = len - 1
+  end
+  rng = ret
+end
+
+function genRoom(rng,cfg,lvl,i)
+  local TopX = math.fmod(i,lvl.block) * lvl.blockWidth
+  local TopY = math.floor(i / lvl.block) * lvl.blockHeight
+    -- top of the block we are inside
+  local room = lvl.room[i]
+  if room[_ID.isGone] then
+    -- place a gone room
+    repeat
+		    room.x = TopX + rng.roll(lvl.blockWidth-2) + 1
+        room.y = TopY + rng.roll(lvl.blockHeight-2) + 1
+		    room.mx = 0 - cfg.maxCols
+		    room.my = 0 - cfg.maxLines
+	  until room.y > 0 and room.y < cfg.maxLines-1
+  else
+    -- place a real room
+    -- are we dark?
+    if rng.roll(10) < (cfg.Level - 1) then lvl.room[i][_ID.isDark] = true end
+    -- place us in the block randomly
+    repeat
+        room.mx = TopX + rng.roll(lvl.blockWidth-4) + 4
+        room.my = TopY + rng.roll(lvl.blockHeight-4) + 4
+        room.x = TopX + rng.roll(lvl.blockWidth - room.mx)
+        room.y = TopY + rng.roll(lvl.blockHeight - room.my)
+    until room.y ~= 0
+
+  end
+end
+
 -- takes an rng generator and level number, fills global Level with information
 -- or puts it into lvl if you pass that
-function genLevel(rng,num,lvl)
+-- cfg is config data for the level, you can pass _CFG if you want
+function genLevel(rng,cfg,lvl)
   if not lvl then lvl = Level end -- adjust the global if we don't pass a specific
-  
+  lvl.map = {}
+  -- store the block limit for this map based on maxRooms
+  lvl.block = math.floor(math.sqrt(cfg.MaxRooms))
+  if (lvl.block * lvl.block) ~= cfg.MaxRooms then error("genLevel() cfg.MaxRooms must be a square! ?" .. cfg.MaxRooms) end
+  -- block dims!
+  lvl.blockWidth = cfg.maxCols / lvl.block
+  lvl.blockHeight = cfg.maxLines / lvl.block
+  lvl.maxGoneRooms = math.floor(cfg.goneRatio * cfg.MaxRooms) -- about 45%
+  -- clear the map entirely
+  for i=1,_CFG.maxCols*_CFG.maxLines,1 do
+    lvl.map[i] = ' '              -- empty space!
+    lvl.map_data[i] = _ID.nothing -- data for the thing at this location
+  end
+  -- create rooms
+  lvl.room = {}
+  for i=1, _CFG.maxRooms,1 do
+    lvl.room[i] = { valGold = 0, numExits = 0, flags = {} } -- empty
+  end
+  local goneRooms = rng:roll(lvl.maxGoneRooms) -- how many are gone?
+  local goneList = genShuffle(rng,genList(lvl.maxGoneRooms)) -- create a shuffled list
+  for i=1, goneRooms,1 do lvl.room[goneList[i]].flags[_ID.isGone] = true end
+  for i=1, _CFG.maxRooms,1 do
+    genRoom(rng,cfg,lvl,i) -- make the room
+  end
+
 end

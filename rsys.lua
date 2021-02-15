@@ -38,14 +38,17 @@ _CFG = {
   maxTraps = 10,
   amuletLevel = 26,
   maxPassages = 13,
+  goneRatio = 0.45, -- make up to 45% of rooms "gone" per level
+                    -- this conforms to 4 of 9 from Rogue 5.2.1
   retNormal = 0,
   retQuit = 1,
   retMinus = 2,
   VERSION = 'RL52B',
   maxCols = 80,
-  maxLines = 45
+  maxLines = 45,
     -- this makes a virtual map 3 times larger than the minimum screen in both dimensions
     -- meaning, we see 1/9th of the total map at any time
+  Level = 1,        -- default to level one if we pass this to gen()
 }
 
 -- a master table of Rogue Identities
@@ -300,8 +303,9 @@ Wands = {}
 -- we got the level
 Level = {
   map = {},
+  map_data = {},
   numTraps = 0,
-  rooms = {}
+  room = {}
 }
 
 
@@ -338,7 +342,8 @@ Action = {
   ['wield'] = { 'w', 'wield weapon'},
   ['wear'] = { '+w', 'wear armor'},
   ['drop'] = { 'd', 'drop object'},
-  ['remove'] = { '+d', 'remove(drop) armor'}
+  ['remove'] = { '+d', 'remove(drop) armor'},
+  ['break'] = { 'b', 'break/bust/clear (chests, webs)'}
 }
 
 -- inputs that don't tick the clock
@@ -408,5 +413,5 @@ Monster = {
   [22] = 'wraith',
   [23] = 'xorn',
   [24] = 'yeti',
-  [25] = 'zombie',
+  [25] = 'zombie'
 }

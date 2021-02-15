@@ -121,6 +121,19 @@ function hash_crc32(str)
 end
 -- end HASHING
 
+function testD20(seed,cnt)
+  local result = {}
+  for i=1,20,1 do result[i] = 0 end
+  local rng = Rng.new(seed)
+  for i=1,cnt,1 do
+    local roll = rng:roll(20)
+    result[roll] = result[roll] + 1
+  end
+  print("Rolled " .. cnt .. " d20s for:")
+  for i=1,20,1 do print(" -- " .. i .. " appeared " .. result[i] .. " times.") end
+end
+
+
 if _APP and _APP.useLÖVE then
   local rng = {
     new = function(x)

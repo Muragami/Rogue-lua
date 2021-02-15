@@ -35,8 +35,6 @@ console = require 'lib.console.console'
 
 once = true
 
-
-
 function echo(txt)
 	for line in string.gmatch(txt,"([^\r\n]*)[\r\n]?") do
    print(line)
